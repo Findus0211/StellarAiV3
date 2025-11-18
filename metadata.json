@@ -1,0 +1,5 @@
+{
+  "name": "Stellar AI",
+  "description": "An advanced AI assistant featuring Chat, Coding Mode, Image Generation, Chess Mode, and Anime Personas, powered by Google Gemini.",
+  "requestFramePermissions": []
+}
