@@ -43,11 +43,18 @@ export enum AppMode {
   SCRIPT_WRITER = 'SCRIPT_WRITER'
 }
 
+export enum AppTheme {
+  DARK = 'DARK',
+  LIGHT = 'LIGHT',
+  LILA = 'LILA'
+}
+
 export interface AppSettings {
   speed: AiSpeed;
   nsfwEnabled: boolean;
   mode: AppMode;
   character: BsdCharacter;
+  theme: AppTheme;
 }
 
 export interface GeneratedImage {

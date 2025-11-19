@@ -20,7 +20,7 @@
     </script>
     <style>
       ::-webkit-scrollbar { width: 8px; height: 8px; }
-      ::-webkit-scrollbar-track { background: #111827; }
+      ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
       ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
     </style>
@@ -39,7 +39,7 @@
     }
     </script>
   </head>
-  <body class="bg-gray-950 text-gray-100 overflow-hidden">
+  <body class="overflow-hidden bg-gray-900 text-gray-100">
     <div id="root"></div>
     
     <script type="text/babel" data-type="module" data-presets="typescript,react">
@@ -50,7 +50,8 @@
       import { 
         Send, Bot, User, Cpu, Swords, Code, Film, 
         Image as ImageIcon, Sparkles, Download, AlertTriangle, 
-        X, Zap, Activity, Settings, Github, Grid2X2, Star, Lock, Box 
+        X, Zap, Activity, Settings, Github, Grid2X2, Star, Lock, Box,
+        Palette, Moon, Sun
       } from "lucide-react";
 
       // --- TYPES ---
@@ -58,6 +59,7 @@
       enum AiSpeed { DEEP_THINKING = 'DEEP_THINKING', NORMAL = 'NORMAL', FAST = 'FAST', VERY_FAST = 'VERY_FAST', EXTREMELY_FAST = 'EXTREMELY_FAST' }
       enum BsdCharacter { NONE = 'NONE', DAZAI = 'DAZAI', CHUUYA = 'CHUUYA', ATSUSHI = 'ATSUSHI', AKUTAGAWA = 'AKUTAGAWA', RANPO = 'RANPO', FYODOR = 'FYODOR', NIKOLAI = 'NIKOLAI', KUNIKIDA = 'KUNIKIDA', YOSANO = 'YOSANO', POE = 'POE' }
       enum AppMode { CHAT = 'CHAT', CHESS = 'CHESS', CODING = 'CODING', SCRIPT_WRITER = 'SCRIPT_WRITER' }
+      enum AppTheme { DARK = 'DARK', LIGHT = 'LIGHT', LILA = 'LILA' }
 
       // --- CONSTANTS ---
       const API_KEY = "AIzaSyA7Oyq-ZDNUnxhYS5pvgRhWjFU_UF7hbX8";
@@ -86,6 +88,18 @@
         [AiSpeed.FAST]: { model: 'gemini-2.0-flash', thinkingBudget: 0 },
         [AiSpeed.VERY_FAST]: { model: 'gemini-2.0-flash-lite-preview-02-05', thinkingBudget: 0 },
         [AiSpeed.EXTREMELY_FAST]: { model: 'gemini-2.0-flash-lite-preview-02-05', thinkingBudget: 0 }
+      };
+
+      const THEME_COLORS = {
+        [AppTheme.DARK]: {
+          bg: '#030712', nav: '#111827', card: '#1f2937', border: '#374151', text: '#f3f4f6', textSec: '#9ca3af', accent: '#8b5cf6', inputBg: '#0f172a', userBubble: '#374151', botBubble: '#1f2937', prose: 'prose-invert'
+        },
+        [AppTheme.LIGHT]: {
+          bg: '#f3f4f6', nav: '#ffffff', card: '#ffffff', border: '#e5e7eb', text: '#111827', textSec: '#4b5563', accent: '#7c3aed', inputBg: '#ffffff', userBubble: '#e5e7eb', botBubble: '#ffffff', prose: 'prose-gray'
+        },
+        [AppTheme.LILA]: {
+          bg: '#2e1065', nav: '#4c1d95', card: '#581c87', border: '#7e22ce', text: '#f3e8ff', textSec: '#d8b4fe', accent: '#d8b4fe', inputBg: '#3b0764', userBubble: '#6b21a8', botBubble: '#581c87', prose: 'prose-invert'
+        }
       };
 
       // --- SERVICES ---
@@ -149,7 +163,7 @@
         const renderSquare = (piece, rowIdx, colIdx) => {
           const isDark = (rowIdx + colIdx) % 2 === 1;
           return (
-            <div key={`${rowIdx}-${colIdx}`} className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-2xl sm:text-3xl select-none ${isDark ? 'bg-stellar-dark/50 text-gray-200' : 'bg-gray-200 text-gray-900'}`}>
+            <div key={`${rowIdx}-${colIdx}`} className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-2xl sm:text-3xl select-none ${isDark ? 'bg-gray-700/50 text-gray-200' : 'bg-gray-200 text-gray-900'}`}>
               {piece && <span className={piece === piece.toUpperCase() ? 'text-white drop-shadow-md' : 'text-black'}>{PIECES[piece]}</span>}
             </div>
           );
@@ -177,35 +191,48 @@
       // SettingsModal
       const SettingsModal = ({ isOpen, onClose, settings, setSettings }) => {
         if (!isOpen) return null;
+        const theme = THEME_COLORS[settings.theme];
         const handleChange = (key, value) => setSettings(prev => ({ ...prev, [key]: value }));
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-            <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-              <div className="flex justify-between items-center p-5 border-b border-gray-800 bg-gray-900">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2"><Activity className="text-stellar" /> Performance Settings</h2>
-                <button onClick={onClose} className="text-gray-400 hover:text-white transition"><X size={24} /></button>
+            <div className="border rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden transition-colors duration-300"
+                 style={{ backgroundColor: theme.card, borderColor: theme.border, color: theme.text }}>
+              <div className="flex justify-between items-center p-5 border-b" style={{ borderColor: theme.border, backgroundColor: theme.nav }}>
+                <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: theme.text }}><Activity style={{ color: theme.accent }} /> Performance</h2>
+                <button onClick={onClose} className="hover:opacity-70"><X size={24} style={{ color: theme.textSec }} /></button>
               </div>
               <div className="p-6 space-y-6">
+                 <div>
+                    <label className="block text-sm font-medium mb-3 flex items-center gap-2" style={{ color: theme.textSec }}><Palette size={16} /> Theme</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[{ val: AppTheme.DARK, label: 'Dark', icon: <Moon size={16}/> }, { val: AppTheme.LIGHT, label: 'Light', icon: <Sun size={16}/> }, { val: AppTheme.LILA, label: 'Lila', icon: <Palette size={16}/> }].map((opt) => (
+                        <button key={opt.val} onClick={() => handleChange('theme', opt.val)} className={`p-3 rounded-xl border transition-all flex flex-col items-center gap-2 ${settings.theme === opt.val ? 'shadow-md' : 'hover:opacity-80'}`}
+                          style={{ backgroundColor: settings.theme === opt.val ? `${theme.accent}33` : theme.bg, borderColor: settings.theme === opt.val ? theme.accent : theme.border, color: settings.theme === opt.val ? theme.text : theme.textSec }}>
+                          {opt.icon}<span className="text-sm font-bold">{opt.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-3 flex items-center gap-2"><Zap size={16} /> Processing Speed</label>
+                  <label className="block text-sm font-medium mb-3 flex items-center gap-2" style={{ color: theme.textSec }}><Zap size={16} /> Speed</label>
                   <div className="grid grid-cols-1 gap-3">
                     {[
-                      { val: AiSpeed.DEEP_THINKING, label: 'Deep Thinking', desc: 'Gemini 1.5 Pro • Highest IQ' },
-                      { val: AiSpeed.NORMAL, label: 'Normal', desc: 'Gemini 2.0 Flash • Balanced' },
-                      { val: AiSpeed.FAST, label: 'Fast', desc: 'Gemini 2.0 Flash • Low Latency' },
-                      { val: AiSpeed.VERY_FAST, label: 'Very Fast', desc: 'Flash Lite • Fast' },
-                      { val: AiSpeed.EXTREMELY_FAST, label: 'Extremely Fast', desc: 'Flash Lite • Minimalist' },
+                      { val: AiSpeed.DEEP_THINKING, label: 'Deep Thinking', desc: 'Gemini 1.5 Pro' },
+                      { val: AiSpeed.NORMAL, label: 'Normal', desc: 'Gemini 2.0 Flash' },
+                      { val: AiSpeed.FAST, label: 'Fast', desc: 'Gemini 2.0 Flash' },
+                      { val: AiSpeed.VERY_FAST, label: 'Very Fast', desc: 'Flash Lite' },
+                      { val: AiSpeed.EXTREMELY_FAST, label: 'Extremely Fast', desc: 'Flash Lite Minimal' },
                     ].map((opt) => (
-                      <button key={opt.val} onClick={() => handleChange('speed', opt.val)} className={`p-4 rounded-xl border text-left transition-all flex justify-between items-center ${settings.speed === opt.val ? 'bg-stellar/20 border-stellar text-white' : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750'}`}>
+                      <button key={opt.val} onClick={() => handleChange('speed', opt.val)} className={`p-4 rounded-xl border text-left transition-all flex justify-between items-center ${settings.speed === opt.val ? 'shadow-md' : 'hover:opacity-90'}`} style={{ backgroundColor: settings.speed === opt.val ? `${theme.accent}20` : theme.bg, borderColor: settings.speed === opt.val ? theme.accent : theme.border, color: settings.speed === opt.val ? theme.text : theme.textSec }}>
                         <div><div className="font-bold text-sm">{opt.label}</div><div className="text-xs opacity-70">{opt.desc}</div></div>
-                        {settings.speed === opt.val && <div className="w-3 h-3 bg-stellar rounded-full shadow-[0_0_10px_rgba(139,92,246,0.8)]" />}
+                        {settings.speed === opt.val && <div className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.8)]" style={{ backgroundColor: theme.accent }} />}
                       </button>
                     ))}
                   </div>
                 </div>
               </div>
-              <div className="p-5 border-t border-gray-800 bg-gray-900 text-right">
-                <button onClick={onClose} className="bg-stellar hover:bg-stellar-dark text-white px-6 py-2 rounded-lg font-medium transition">Close</button>
+              <div className="p-5 border-t text-right" style={{ borderColor: theme.border, backgroundColor: theme.nav }}>
+                <button onClick={onClose} className="text-white px-6 py-2 rounded-lg font-medium transition shadow-lg" style={{ backgroundColor: theme.accent }}>Close</button>
               </div>
             </div>
           </div>
@@ -217,6 +244,7 @@
         const [showPasswordInput, setShowPasswordInput] = useState(false);
         const [passwordAttempt, setPasswordAttempt] = useState('');
         const [errorMsg, setErrorMsg] = useState('');
+        const theme = THEME_COLORS[settings.theme];
         if (!isOpen) return null;
         const handleSettingChange = (key, value) => setSettings(prev => ({ ...prev, [key]: value }));
         const handleNsfwToggle = () => {
@@ -248,55 +276,55 @@
         ];
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-            <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-              <div className="flex justify-between items-center p-5 border-b border-gray-800 bg-gray-900">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2"><Star className="text-stellar" /> Modes & Personas</h2>
-                <button onClick={onClose} className="text-gray-400 hover:text-white transition"><X size={24} /></button>
+            <div className="border rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" style={{ backgroundColor: theme.card, borderColor: theme.border }}>
+              <div className="flex justify-between items-center p-5 border-b" style={{ backgroundColor: theme.nav, borderColor: theme.border }}>
+                <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: theme.text }}><Star style={{ color: theme.accent }} /> Modes & Personas</h2>
+                <button onClick={onClose} className="hover:opacity-70"><X size={24} style={{ color: theme.textSec }} /></button>
               </div>
               <div className="flex-1 overflow-y-auto p-6 space-y-8">
                 <section>
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Operation Mode</h3>
+                  <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: theme.textSec }}>Operation Mode</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {modes.map((mode) => (
-                      <button key={mode.id} onClick={() => handleSettingChange('mode', mode.id)} className={`p-4 rounded-xl border text-left transition-all flex items-start gap-3 ${settings.mode === mode.id ? 'bg-stellar/20 border-stellar text-white' : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750'}`}>
-                        <div className={`mt-1 ${settings.mode === mode.id ? 'text-stellar' : 'text-gray-500'}`}>{mode.icon}</div>
-                        <div><div className="font-bold">{mode.name}</div><div className="text-xs opacity-70">{mode.desc}</div></div>
+                      <button key={mode.id} onClick={() => handleSettingChange('mode', mode.id)} className={`p-4 rounded-xl border text-left transition-all flex items-start gap-3 ${settings.mode === mode.id ? 'shadow-md' : 'hover:opacity-90'}`} style={{ backgroundColor: settings.mode === mode.id ? `${theme.accent}20` : theme.bg, borderColor: settings.mode === mode.id ? theme.accent : theme.border, color: settings.mode === mode.id ? theme.text : theme.textSec }}>
+                        <div className="mt-1" style={{ color: settings.mode === mode.id ? theme.accent : theme.textSec }}>{mode.icon}</div>
+                        <div><div className="font-bold" style={{ color: settings.mode === mode.id ? theme.text : theme.textSec }}>{mode.name}</div><div className="text-xs opacity-70">{mode.desc}</div></div>
                       </button>
                     ))}
                   </div>
                 </section>
                 <section>
-                   <div className="flex justify-between items-center mb-4"><h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">BSD Persona</h3></div>
+                   <div className="flex justify-between items-center mb-4"><h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: theme.textSec }}>BSD Persona</h3></div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     {characters.map((char) => (
-                      <button key={char.id} onClick={() => handleSettingChange('character', char.id)} className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-2 h-28 ${settings.character === char.id ? 'bg-stellar/20 border-stellar text-white shadow-lg shadow-stellar/10' : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${settings.character === char.id ? 'bg-stellar text-white' : 'bg-gray-700'}`}><User size={16} /></div>
+                      <button key={char.id} onClick={() => handleSettingChange('character', char.id)} className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-2 h-28 ${settings.character === char.id ? 'shadow-md' : 'hover:opacity-90'}`} style={{ backgroundColor: settings.character === char.id ? `${theme.accent}20` : theme.bg, borderColor: settings.character === char.id ? theme.accent : theme.border, color: settings.character === char.id ? theme.text : theme.textSec }}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center`} style={{ backgroundColor: settings.character === char.id ? theme.accent : theme.border, color: '#fff' }}><User size={16} /></div>
                         <div className="flex flex-col"><span className="font-bold text-sm leading-tight">{char.name}</span><span className="text-[10px] opacity-60 mt-1 line-clamp-1">{char.desc}</span></div>
                       </button>
                     ))}
                   </div>
                 </section>
-                <section className="border-t border-gray-800 pt-6">
+                <section className="border-t pt-6" style={{ borderColor: theme.border }}>
                   <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-4 flex items-center gap-2"><AlertTriangle size={16} /> Restricted Settings</h3>
-                   <div className="flex flex-col bg-red-950/20 rounded-xl border border-red-900/30 overflow-hidden">
+                   <div className="flex flex-col rounded-xl border border-red-900/30 overflow-hidden" style={{ backgroundColor: `${theme.bg}40` }}>
                      <div className="flex items-center justify-between p-4">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-red-900/30 rounded-lg text-red-500">{settings.nsfwEnabled ? <AlertTriangle size={24} /> : <Lock size={24} />}</div>
-                          <div><div className="font-bold text-red-100">NSFW Mode</div><div className="text-xs text-red-300/60">Disables safety filters.</div></div>
+                          <div><div className="font-bold" style={{ color: theme.text }}>NSFW Mode</div><div className="text-xs text-red-400/80">Disables safety filters.</div></div>
                         </div>
                         {!showPasswordInput && (
-                          <button onClick={handleNsfwToggle} className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors ${settings.nsfwEnabled ? 'bg-red-600' : 'bg-gray-700'}`}>
+                          <button onClick={handleNsfwToggle} className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors ${settings.nsfwEnabled ? 'bg-red-600' : 'bg-gray-600'}`}>
                             <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${settings.nsfwEnabled ? 'translate-x-8' : 'translate-x-1'}`} />
                           </button>
                         )}
                     </div>
                     {showPasswordInput && (
-                       <div className="bg-black/20 p-4 border-t border-red-900/30 flex flex-col gap-2">
-                          <label className="text-xs text-red-200 font-mono uppercase">Enter Access Password:</label>
+                       <div className="p-4 border-t border-red-900/30 flex flex-col gap-2" style={{ backgroundColor: `${theme.nav}80` }}>
+                          <label className="text-xs text-red-400 font-mono uppercase">Enter Access Password:</label>
                           <div className="flex gap-2">
-                            <input type="password" autoFocus className="flex-1 bg-gray-900 border border-red-900/50 rounded-lg px-3 py-2 text-white focus:border-red-500 outline-none" placeholder="Password..." value={passwordAttempt} onChange={(e) => setPasswordAttempt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && verifyPassword()} />
+                            <input type="password" autoFocus className="flex-1 border border-red-900/50 rounded-lg px-3 py-2 focus:border-red-500 outline-none" style={{ backgroundColor: theme.bg, color: theme.text }} placeholder="Password..." value={passwordAttempt} onChange={(e) => setPasswordAttempt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && verifyPassword()} />
                             <button onClick={verifyPassword} className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition">Unlock</button>
-                            <button onClick={() => { setShowPasswordInput(false); setPasswordAttempt(''); setErrorMsg(''); }} className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg text-sm transition">Cancel</button>
+                            <button onClick={() => { setShowPasswordInput(false); setPasswordAttempt(''); setErrorMsg(''); }} className="px-3 py-2 rounded-lg text-sm transition text-white" style={{ backgroundColor: theme.border }}>Cancel</button>
                           </div>
                           {errorMsg && <div className="text-red-400 text-xs font-bold mt-1">{errorMsg}</div>}
                        </div>
@@ -304,8 +332,8 @@
                   </div>
                 </section>
               </div>
-              <div className="p-5 border-t border-gray-800 bg-gray-900 text-right">
-                <button onClick={onClose} className="bg-stellar hover:bg-stellar-dark text-white px-8 py-3 rounded-xl font-bold transition shadow-lg shadow-stellar/20">Done</button>
+              <div className="p-5 border-t text-right" style={{ backgroundColor: theme.nav, borderColor: theme.border }}>
+                <button onClick={onClose} className="text-white px-8 py-3 rounded-xl font-bold transition shadow-lg" style={{ backgroundColor: theme.accent }}>Done</button>
               </div>
             </div>
           </div>
@@ -316,6 +344,7 @@
       const ChatInterface = ({ messages, input, setInput, onSend, isLoading, settings }) => {
         const messagesEndRef = useRef(null);
         const textareaRef = useRef(null);
+        const theme = THEME_COLORS[settings.theme];
         useEffect(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), [messages]);
         useEffect(() => { if (textareaRef.current) { textareaRef.current.style.height = 'auto'; textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px'; } }, [input]);
         const handleKeyDown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSend(); } };
@@ -335,19 +364,19 @@
         };
         const renderEmptyStateIcon = () => {
           switch (settings.mode) {
-            case AppMode.CHESS: return <Swords size={48} className="text-stellar" />;
-            case AppMode.CODING: return <Code size={48} className="text-stellar" />;
-            case AppMode.SCRIPT_WRITER: return <Film size={48} className="text-stellar" />;
-            default: return <Cpu size={48} className="text-stellar" />;
+            case AppMode.CHESS: return <Swords size={48} style={{ color: theme.accent }} />;
+            case AppMode.CODING: return <Code size={48} style={{ color: theme.accent }} />;
+            case AppMode.SCRIPT_WRITER: return <Film size={48} style={{ color: theme.accent }} />;
+            default: return <Cpu size={48} style={{ color: theme.accent }} />;
           }
         };
         return (
-          <div className="flex flex-col h-full bg-gray-900 relative">
+          <div className="flex flex-col h-full relative transition-colors duration-300" style={{ backgroundColor: theme.bg }}>
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin">
               {messages.length === 0 && (
-                <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 opacity-60">
-                  <div className="bg-gray-800 p-6 rounded-full mb-6 animate-pulse-slow relative group">{renderEmptyStateIcon()}</div>
-                  <h2 className="text-2xl font-bold mb-2 text-white">Stellar AI Online</h2>
+                <div className="h-full flex flex-col items-center justify-center text-center opacity-60" style={{ color: theme.textSec }}>
+                  <div className="p-6 rounded-full mb-6 animate-pulse-slow relative group" style={{ backgroundColor: theme.card }}>{renderEmptyStateIcon()}</div>
+                  <h2 className="text-2xl font-bold mb-2" style={{ color: theme.text }}>Stellar AI Online</h2>
                   <p className="max-w-md mx-auto">{settings.mode === AppMode.CHESS ? "Chess Engine initialized." : settings.mode === AppMode.CODING ? "Coding Mode active." : "Select a persona or start typing to begin."}</p>
                 </div>
               )}
@@ -356,14 +385,14 @@
                 return (
                   <div key={msg.id} className={`flex w-full ${msg.role === MessageRole.USER ? 'justify-end' : 'justify-start'}`}>
                     <div className={`flex max-w-[90%] sm:max-w-[80%] gap-3 ${msg.role === MessageRole.USER ? 'flex-row-reverse' : 'flex-row'}`}>
-                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg ${msg.role === MessageRole.USER ? 'bg-gray-800 border border-gray-700' : 'bg-gradient-to-br from-stellar to-stellar-dark text-white'}`}>
+                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg border`} style={{ backgroundColor: msg.role === MessageRole.USER ? theme.card : theme.accent, borderColor: theme.border, color: msg.role === MessageRole.USER ? theme.text : '#fff' }}>
                         {msg.role === MessageRole.USER ? <User size={18} /> : <Bot size={18} />}
                       </div>
                       <div className="flex flex-col gap-2">
                           {content && (
-                            <div className={`p-3 sm:p-5 rounded-2xl text-sm sm:text-base leading-relaxed shadow-md ${msg.role === MessageRole.USER ? 'bg-gray-700 text-white rounded-tr-none' : 'bg-gray-800 text-gray-100 rounded-tl-none border border-gray-700'}`}>
-                              <ReactMarkdown className="prose prose-invert prose-p:my-1 prose-pre:bg-gray-950 prose-pre:p-3 prose-pre:rounded-lg prose-pre:border prose-pre:border-gray-800 max-w-none" components={{ code: ({node, className, children, ...props}) => { const match = /language-(\w+)/.exec(className || ''); const isInline = !match && !String(children).includes('\n'); return isInline ? (<code className="bg-gray-900/50 px-1 py-0.5 rounded text-stellar-light font-mono text-xs sm:text-sm border border-gray-700/50" {...props}>{children}</code>) : (<code className={className} {...props}>{children}</code>); } }}>{content}</ReactMarkdown>
-                              {msg.role === MessageRole.MODEL && isLoading && msg.id === messages[messages.length - 1].id && content.length === 0 && <span className="inline-block w-2 h-4 bg-stellar animate-pulse ml-1"/>}
+                            <div className={`p-3 sm:p-5 rounded-2xl text-sm sm:text-base leading-relaxed shadow-md ${msg.role === MessageRole.USER ? 'rounded-tr-none' : 'rounded-tl-none border'}`} style={{ backgroundColor: msg.role === MessageRole.USER ? theme.userBubble : theme.botBubble, color: theme.text, borderColor: theme.border }}>
+                              <ReactMarkdown className={`prose ${theme.prose} prose-p:my-1 prose-pre:p-3 prose-pre:rounded-lg prose-pre:border max-w-none`} components={{ code: ({node, className, children, ...props}) => { const match = /language-(\w+)/.exec(className || ''); const isInline = !match && !String(children).includes('\n'); return isInline ? (<code className="px-1 py-0.5 rounded font-mono text-xs sm:text-sm border" style={{ backgroundColor: `${theme.bg}AA`, borderColor: theme.border, color: theme.accent }} {...props}>{children}</code>) : (<code className={className} {...props}>{children}</code>); } }}>{content}</ReactMarkdown>
+                              {msg.role === MessageRole.MODEL && isLoading && msg.id === messages[messages.length - 1].id && content.length === 0 && <span className="inline-block w-2 h-4 animate-pulse ml-1" style={{ backgroundColor: theme.accent }}/>}
                             </div>
                           )}
                           {fen && <ChessBoard fen={fen} />}
@@ -374,14 +403,14 @@
               })}
               <div ref={messagesEndRef} />
             </div>
-            <div className="p-4 bg-gray-950/80 backdrop-blur border-t border-gray-800">
-              <div className="max-w-4xl mx-auto relative flex items-end gap-2 bg-gray-900 p-2 rounded-xl border border-gray-700 focus-within:border-stellar transition-colors shadow-lg">
-                <textarea ref={textareaRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder={getPlaceholder()} className="flex-1 bg-transparent text-white placeholder-gray-500 p-3 focus:outline-none resize-none max-h-32 min-h-[48px]" rows={1} />
-                <button onClick={onSend} disabled={isLoading || !input.trim()} className="p-3 rounded-lg bg-stellar hover:bg-stellar-dark disabled:bg-gray-800 disabled:text-gray-600 text-white transition-all flex-shrink-0 shadow-lg shadow-stellar/20">
+            <div className="p-4 backdrop-blur border-t" style={{ borderColor: theme.border, backgroundColor: `${theme.bg}CC` }}>
+              <div className="max-w-4xl mx-auto relative flex items-end gap-2 p-2 rounded-xl border transition-colors shadow-lg" style={{ backgroundColor: theme.inputBg, borderColor: theme.border }}>
+                <textarea ref={textareaRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder={getPlaceholder()} className="flex-1 bg-transparent p-3 focus:outline-none resize-none max-h-32 min-h-[48px]" style={{ color: theme.text }} rows={1} />
+                <button onClick={onSend} disabled={isLoading || !input.trim()} className="p-3 rounded-lg text-white transition-all flex-shrink-0 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: theme.accent }}>
                   {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send size={20} />}
                 </button>
               </div>
-              <div className="text-center mt-2 text-[10px] uppercase tracking-widest text-gray-600 font-medium">{settings.mode.replace('_', ' ')} • {settings.nsfwEnabled ? 'UNRESTRICTED' : 'SECURE'} • {settings.character !== BsdCharacter.NONE ? settings.character : 'STANDARD'}</div>
+              <div className="text-center mt-2 text-[10px] uppercase tracking-widest font-medium" style={{ color: theme.textSec }}>{settings.mode.replace('_', ' ')} • {settings.nsfwEnabled ? 'UNRESTRICTED' : 'SECURE'} • {settings.character !== BsdCharacter.NONE ? settings.character : 'STANDARD'}</div>
             </div>
           </div>
         );
@@ -393,6 +422,7 @@
         const [isLoading, setIsLoading] = useState(false);
         const [generatedImages, setGeneratedImages] = useState([]);
         const [error, setError] = useState(null);
+        const theme = THEME_COLORS[settings.theme];
         const handleGenerate = async () => {
           if (!prompt.trim()) return;
           setIsLoading(true); setError(null);
@@ -403,13 +433,13 @@
           } catch (err) { setError("Failed to generate image. Try a different prompt or check safety settings."); } finally { setIsLoading(false); }
         };
         return (
-          <div className="flex flex-col h-full bg-gray-900 p-4 sm:p-8 overflow-y-auto">
+          <div className="flex flex-col h-full p-4 sm:p-8 overflow-y-auto transition-colors duration-300" style={{ backgroundColor: theme.bg }}>
             <div className="max-w-5xl mx-auto w-full space-y-8">
-              <div className="text-center space-y-2"><h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-stellar-light to-stellar">Stellar Vision</h1><p className="text-gray-400">Generate high-quality images.</p></div>
-              <div className="bg-gray-800 p-4 rounded-2xl border border-gray-700 shadow-xl">
+              <div className="text-center space-y-2"><h1 className="text-3xl font-bold text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(to right, ${theme.accent}, ${theme.textSec})` }}>Stellar Vision</h1><p style={{ color: theme.textSec }}>Generate high-quality images.</p></div>
+              <div className="p-4 rounded-2xl border shadow-xl" style={{ backgroundColor: theme.card, borderColor: theme.border }}>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleGenerate()} placeholder="Describe the image..." className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 focus:border-stellar outline-none text-white" />
-                  <button onClick={handleGenerate} disabled={isLoading || !prompt.trim()} className="bg-gradient-to-r from-stellar to-stellar-dark text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition disabled:opacity-50 min-w-[140px]">
+                  <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleGenerate()} placeholder="Describe the image..." className="flex-1 rounded-xl px-4 py-3 outline-none border" style={{ backgroundColor: theme.bg, borderColor: theme.border, color: theme.text }} />
+                  <button onClick={handleGenerate} disabled={isLoading || !prompt.trim()} className="text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition disabled:opacity-50 min-w-[140px]" style={{ backgroundColor: theme.accent }}>
                     {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Sparkles size={18} /> Generate</>}
                   </button>
                 </div>
@@ -417,9 +447,9 @@
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {generatedImages.map((img) => (
-                  <div key={img.id} className="group relative bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg">
+                  <div key={img.id} className="group relative rounded-xl overflow-hidden border shadow-lg transition" style={{ borderColor: theme.border, backgroundColor: theme.card }}>
                     <img src={img.url} alt={img.prompt} className="w-full h-64 object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4 bg-gradient-to-t from-black/80 to-transparent">
                       <p className="text-white text-sm line-clamp-2 mb-2">{img.prompt}</p>
                       <a href={img.url} download={`stellar-ai-${img.id}.png`} className="bg-white/20 backdrop-blur hover:bg-white/30 text-white py-2 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition"><Download size={16} /> Download</a>
                     </div>
@@ -444,7 +474,8 @@
         const [activeTab, setActiveTab] = useState('chat');
         const [isSettingsOpen, setIsSettingsOpen] = useState(false);
         const [isModesMenuOpen, setIsModesMenuOpen] = useState(false);
-        const [settings, setSettings] = useState({ speed: AiSpeed.NORMAL, nsfwEnabled: false, mode: AppMode.CHAT, character: BsdCharacter.NONE });
+        const [settings, setSettings] = useState({ speed: AiSpeed.NORMAL, nsfwEnabled: false, mode: AppMode.CHAT, character: BsdCharacter.NONE, theme: AppTheme.DARK });
+        const theme = THEME_COLORS[settings.theme];
         const [input, setInput] = useState('');
         const [messages, setMessages] = useState([]);
         const [isLoading, setIsLoading] = useState(false);
@@ -477,28 +508,28 @@
         };
 
         return (
-          <div className="flex h-screen bg-gray-950 text-gray-100 font-sans overflow-hidden selection:bg-stellar/30 selection:text-white">
-            <nav className="hidden md:flex flex-col w-20 bg-gray-900 border-r border-gray-800 items-center py-6 gap-6 z-20 shadow-2xl">
+          <div className="flex h-screen font-sans overflow-hidden selection:bg-purple-500/30 transition-colors duration-300" style={{ backgroundColor: theme.bg, color: theme.text }}>
+            <nav className="hidden md:flex flex-col w-20 border-r items-center py-6 gap-6 z-20 shadow-2xl transition-colors duration-300" style={{ backgroundColor: theme.nav, borderColor: theme.border }}>
               <div className="mb-4 hover:scale-110 transition-transform duration-300 cursor-default"><StellarLogo /></div>
-              <button onClick={() => setActiveTab('chat')} className={`p-3 rounded-xl transition-all relative group ${activeTab === 'chat' ? 'bg-gray-800 text-stellar shadow-lg shadow-stellar/10' : 'text-gray-500 hover:text-gray-300'}`}><MessageSquare size={24} />{activeTab === 'chat' && <div className="absolute inset-y-2 left-0 w-1 bg-stellar rounded-r-full" />}</button>
-              <button onClick={() => setActiveTab('image')} className={`p-3 rounded-xl transition-all relative group ${activeTab === 'image' ? 'bg-gray-800 text-stellar shadow-lg shadow-stellar/10' : 'text-gray-500 hover:text-gray-300'}`}><ImageIcon size={24} />{activeTab === 'image' && <div className="absolute inset-y-2 left-0 w-1 bg-stellar rounded-r-full" />}</button>
-              <div className="w-8 h-[1px] bg-gray-800 my-2" />
-              <button onClick={() => setIsModesMenuOpen(true)} className="p-3 rounded-xl transition-all text-gray-500 hover:text-white hover:bg-gray-800 group relative"><Grid2X2 size={24} /></button>
+              <button onClick={() => setActiveTab('chat')} className={`p-3 rounded-xl transition-all relative group`} style={{ backgroundColor: activeTab === 'chat' ? theme.card : 'transparent', color: activeTab === 'chat' ? theme.accent : theme.textSec }}><MessageSquare size={24} />{activeTab === 'chat' && <div className="absolute inset-y-2 left-0 w-1 rounded-r-full" style={{ backgroundColor: theme.accent }} />}</button>
+              <button onClick={() => setActiveTab('image')} className={`p-3 rounded-xl transition-all relative group`} style={{ backgroundColor: activeTab === 'image' ? theme.card : 'transparent', color: activeTab === 'image' ? theme.accent : theme.textSec }}><ImageIcon size={24} />{activeTab === 'image' && <div className="absolute inset-y-2 left-0 w-1 rounded-r-full" style={{ backgroundColor: theme.accent }} />}</button>
+              <div className="w-8 h-[1px] my-2" style={{ backgroundColor: theme.border }} />
+              <button onClick={() => setIsModesMenuOpen(true)} className="p-3 rounded-xl transition-all group relative hover:bg-opacity-10" style={{ color: theme.textSec }}><Grid2X2 size={24} /></button>
               <div className="mt-auto flex flex-col gap-4">
-                 <a href="https://github.com" target="_blank" className="p-3 text-gray-500 hover:text-white transition"><Github size={24} /></a>
-                <button onClick={() => setIsSettingsOpen(true)} className="p-3 text-gray-500 hover:text-white hover:rotate-90 transition duration-300"><Settings size={24} /></button>
+                 <a href="https://github.com" target="_blank" className="p-3 transition" style={{ color: theme.textSec }}><Github size={24} /></a>
+                <button onClick={() => setIsSettingsOpen(true)} className="p-3 hover:rotate-90 transition duration-300" style={{ color: theme.textSec }}><Settings size={24} /></button>
               </div>
             </nav>
-            <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-gray-900/90 backdrop-blur border-b border-gray-800 flex items-center justify-between px-4 z-30">
-               <div className="font-bold text-xl text-white flex items-center gap-3"><StellarLogo /><span className="tracking-tight">Stellar AI</span></div>
+            <div className="md:hidden fixed top-0 left-0 right-0 h-16 backdrop-blur border-b flex items-center justify-between px-4 z-30 transition-colors" style={{ backgroundColor: `${theme.nav}E6`, borderColor: theme.border }}>
+               <div className="font-bold text-xl flex items-center gap-3" style={{ color: theme.text }}><StellarLogo /><span className="tracking-tight">Stellar AI</span></div>
                <div className="flex gap-2">
-                 <button onClick={() => setIsModesMenuOpen(true)} className="p-2 text-gray-400 hover:text-white"><Grid2X2 size={22} /></button>
-                 <button onClick={() => setIsSettingsOpen(true)} className="p-2 text-gray-400 hover:text-white"><Settings size={22} /></button>
+                 <button onClick={() => setIsModesMenuOpen(true)} className="p-2" style={{ color: theme.textSec }}><Grid2X2 size={22} /></button>
+                 <button onClick={() => setIsSettingsOpen(true)} className="p-2" style={{ color: theme.textSec }}><Settings size={22} /></button>
                </div>
             </div>
-            <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-gray-900 border-t border-gray-800 flex items-center justify-around z-30">
-              <button onClick={() => setActiveTab('chat')} className={`flex flex-col items-center gap-1 ${activeTab === 'chat' ? 'text-stellar' : 'text-gray-500'}`}><MessageSquare size={20} /><span className="text-[10px]">Chat</span></button>
-              <button onClick={() => setActiveTab('image')} className={`flex flex-col items-center gap-1 ${activeTab === 'image' ? 'text-stellar' : 'text-gray-500'}`}><ImageIcon size={20} /><span className="text-[10px]">Images</span></button>
+            <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 border-t flex items-center justify-around z-30 transition-colors" style={{ backgroundColor: theme.nav, borderColor: theme.border }}>
+              <button onClick={() => setActiveTab('chat')} className={`flex flex-col items-center gap-1`} style={{ color: activeTab === 'chat' ? theme.accent : theme.textSec }}><MessageSquare size={20} /><span className="text-[10px]">Chat</span></button>
+              <button onClick={() => setActiveTab('image')} className={`flex flex-col items-center gap-1`} style={{ color: activeTab === 'image' ? theme.accent : theme.textSec }}><ImageIcon size={20} /><span className="text-[10px]">Images</span></button>
             </div>
             <main className="flex-1 relative pt-16 md:pt-0 pb-16 md:pb-0 h-[100dvh]">
               {activeTab === 'chat' ? <ChatInterface messages={messages} input={input} setInput={setInput} onSend={handleSend} isLoading={isLoading} settings={settings} /> : <ImageGenerator settings={settings} />}

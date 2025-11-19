@@ -1,4 +1,4 @@
-import { AiSpeed, BsdCharacter, AppMode } from './types';
+import { AiSpeed, BsdCharacter, AppMode, AppTheme } from './types';
 
 export const API_KEY = "AIzaSyA7Oyq-ZDNUnxhYS5pvgRhWjFU_UF7hbX8";
 
@@ -23,25 +23,52 @@ export const MODE_INSTRUCTIONS: Record<AppMode, string> = {
   [AppMode.SCRIPT_WRITER]: "You are an award-winning Screenwriter. Format your responses as a professional screenplay (Sluglines, Action, Character Name centered, Dialogue). Focus on showing, not telling."
 };
 
-export const SPEED_CONFIGS: Record<AiSpeed, { model: string; thinkingBudget?: number }> = {
-  [AiSpeed.DEEP_THINKING]: {
-    model: 'gemini-3-pro-preview',
-    thinkingBudget: 16000
+export const SPEED_CONFIGS = {
+  [AiSpeed.DEEP_THINKING]: { model: 'gemini-1.5-pro', thinkingBudget: 0 },
+  [AiSpeed.NORMAL]: { model: 'gemini-2.0-flash', thinkingBudget: 0 },
+  [AiSpeed.FAST]: { model: 'gemini-2.0-flash', thinkingBudget: 0 },
+  [AiSpeed.VERY_FAST]: { model: 'gemini-2.0-flash-lite-preview-02-05', thinkingBudget: 0 },
+  [AiSpeed.EXTREMELY_FAST]: { model: 'gemini-2.0-flash-lite-preview-02-05', thinkingBudget: 0 }
+};
+
+export const THEME_COLORS = {
+  [AppTheme.DARK]: {
+    bg: '#030712', // gray-950
+    nav: '#111827', // gray-900
+    card: '#1f2937', // gray-800
+    border: '#374151', // gray-700
+    text: '#f3f4f6', // gray-100
+    textSec: '#9ca3af', // gray-400
+    accent: '#8b5cf6', // violet-500
+    inputBg: '#0f172a', // slate-900
+    userBubble: '#374151', // gray-700
+    botBubble: '#1f2937', // gray-800
+    prose: 'prose-invert'
   },
-  [AiSpeed.NORMAL]: {
-    model: 'gemini-2.5-flash',
-    thinkingBudget: 0
+  [AppTheme.LIGHT]: {
+    bg: '#f3f4f6', // gray-100
+    nav: '#ffffff', // white
+    card: '#ffffff', // white
+    border: '#e5e7eb', // gray-200
+    text: '#111827', // gray-900
+    textSec: '#4b5563', // gray-600
+    accent: '#7c3aed', // violet-600
+    inputBg: '#ffffff', // white
+    userBubble: '#e5e7eb', // gray-200
+    botBubble: '#ffffff', // white
+    prose: 'prose-gray'
   },
-  [AiSpeed.FAST]: {
-    model: 'gemini-2.5-flash',
-    thinkingBudget: 0
-  },
-  [AiSpeed.VERY_FAST]: {
-    model: 'gemini-flash-lite-latest',
-    thinkingBudget: 0
-  },
-  [AiSpeed.EXTREMELY_FAST]: {
-    model: 'gemini-flash-lite-latest',
-    thinkingBudget: 0
+  [AppTheme.LILA]: {
+    bg: '#2e1065', // purple-950
+    nav: '#4c1d95', // purple-900
+    card: '#581c87', // purple-900 (lighter)
+    border: '#7e22ce', // purple-700
+    text: '#f3e8ff', // purple-100
+    textSec: '#d8b4fe', // purple-300
+    accent: '#d8b4fe', // purple-300
+    inputBg: '#3b0764', // purple-950
+    userBubble: '#6b21a8', // purple-800
+    botBubble: '#581c87', // purple-900
+    prose: 'prose-invert'
   }
 };
